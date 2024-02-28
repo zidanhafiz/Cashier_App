@@ -119,7 +119,7 @@ export default function Home() {
                 </Link>
                 <Button
                   type='submit'
-                  size='lg'
+                  className='px-6'
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Wait' : 'Sign In'}
@@ -128,7 +128,6 @@ export default function Home() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter></CardFooter>
       </Card>
     </main>
   );
