@@ -35,12 +35,11 @@ export const SignInProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    if (isLogin) {
-      return router.push('/dashboard');
-    }
-    if (!isLogin && pathname !== '/forgot-password' && pathname !== '/') {
-      return router.push('/');
-    }
+    // if (isLogin && (pathname === '/' || pathname === '/forgot-password')) {
+    //   return router.push('/dashboard');
+    // } else if (!isLogin) {
+    //   return router.push('/');
+    // }
   }, [isLogin, router, pathname]);
 
   const value = { isLogin, user };

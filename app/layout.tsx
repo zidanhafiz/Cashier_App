@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { SignInProvider } from '@/context/SignInProvider';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,6 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SignInProvider>{children}</SignInProvider>
+          <ToastContainer />
         </ThemeProvider>
       </body>
     </html>
