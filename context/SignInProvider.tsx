@@ -1,8 +1,7 @@
 'use client';
 import { auth } from '@/lib/firebase/firebase';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { redirect, usePathname, useRouter } from 'next/navigation';
-import { ReactNode, createContext, useContext, useState } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 interface SignInContextType {
   isLogin: boolean;
@@ -23,14 +22,16 @@ export const SignInProvider = ({ children }: { children: ReactNode }) => {
   const [isLogin, setIsLogin] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
-  onAuthStateChanged(auth, (user) => {
-    if (user?.uid) {
-      setUser(user);
-      return setIsLogin(true);
-    }
-    setUser(null);
-    return setIsLogin(false);
-  });
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user?.uid) {
+        setUser(user);
+        return setIsLogin(true);
+      }
+      setUser(null);
+      return setIsLogin(false);
+    });
+  }, []);
 
   const value = { isLogin, user };
   return <SignInContext.Provider value={value}>{children}</SignInContext.Provider>;
