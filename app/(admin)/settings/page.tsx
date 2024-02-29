@@ -21,7 +21,6 @@ import { z } from 'zod';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateProfileToFirebase, uploadTempAvatar } from '@/lib/firebase/profileService';
-import Alert from './Alert';
 import { showNotify } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import {
@@ -31,19 +30,35 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { showAlert } from '@/components/Alert';
+import { useAlert } from '@/context/AlertProvider';
+
+const saveAlert = {
+  title: 'Save Changes',
+  description: 'Save changes to update your profile information.',
+  cancel: 'Cancel',
+  continue: 'Save',
+};
+
+const discardAlert = {
+  title: 'Discard Changes',
+  description: 'Are you sure to discard this changes?',
+  cancel: 'Cancel',
+  continue: 'Yes',
+};
 
 const formSchema = z.object({
   displayName: z.string().min(3, {
     message: 'Username must be at least 3 characters.',
   }),
-  avatar: z.any(),
+  avatar: z.instanceof(File),
 });
 
 const Settings = () => {
   const router = useRouter();
   const { user } = useSignIn();
+  const { showAlertHandle } = useAlert();
   const [imgUrl, setImgUrl] = useState<string>('');
-  const [openAlert, setOpenAlert] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,41 +75,37 @@ const Settings = () => {
 
   const avatarWatch: File = form.watch('avatar');
 
-  const onSubmit = async () => {
-    setOpenAlert(true);
-  };
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    await showAlert(saveAlert, 'save', showAlertHandle);
 
-  // Function for continue click on alert component
-  const handleContinueClick = async () => {
-    const data = form.getValues();
-    const avatar = data.avatar;
-    const displayName = data.displayName;
-
-    updateProfileToFirebase(avatar, displayName)
-      .then((res) => {
-        router.refresh();
-        router.push('/dashboard');
-        showNotify({
-          type: 'success',
-          message: 'Profile updated!',
-        });
-      })
-      .catch((err) => {
-        router.push('/dashboard');
-        showNotify({
-          type: 'error',
-          message: 'Error update profile!',
-        });
+    try {
+      await updateProfileToFirebase(values.avatar, values.displayName);
+      router.refresh();
+      router.push('/dashboard');
+      showNotify({
+        type: 'success',
+        message: 'Profile updated!',
       });
+    } catch (error) {
+      router.push('/dashboard');
+      showNotify({
+        type: 'error',
+        message: 'Error update profile!',
+      });
+    }
   };
 
   // Function for discard button click and restore previous value on input form
-  const handleDiscardClick = () => {
-    form.reset({
-      displayName: user?.displayName || '',
-      avatar: null,
-    });
-    setImgUrl(user?.photoURL || '');
+  const handleDiscardClick = async () => {
+    showAlert(discardAlert, 'discard', showAlertHandle)
+      .then(() => {
+        form.reset({
+          displayName: user?.displayName || '',
+          avatar: undefined,
+        });
+        setImgUrl(user?.photoURL || '');
+      })
+      .catch();
   };
 
   // Change avatar preview when upload image
@@ -148,7 +159,6 @@ const Settings = () => {
                       placeholder='avatar'
                       type='file'
                       accept='image/png,image/jpeg'
-                      value={value?.fileName}
                       onChange={(event) => {
                         event.target.files && onChange(event?.target?.files[0]);
                       }}
@@ -180,27 +190,20 @@ const Settings = () => {
               )}
             />
             <div className='flex gap-3 justify-end'>
-              <Alert
-                type='discard'
-                openAlert={openAlert}
-                setOpenAlert={setOpenAlert}
+              <Button
+                className='bg-red-500 hover:bg-red-600 text-white'
+                disabled={isSubmitting}
                 onClick={handleDiscardClick}
+                type='reset'
               >
-                <Button
-                  className='bg-red-500 hover:bg-red-600 text-white'
-                  disabled={isSubmitting}
-                >
-                  Discard
-                </Button>
-              </Alert>
-              <Alert
-                type='save'
-                openAlert={openAlert}
-                setOpenAlert={setOpenAlert}
-                onClick={handleContinueClick}
+                Discard
+              </Button>
+              <Button
+                type='submit'
+                disabled={isSubmitting}
               >
-                <Button disabled={isSubmitting}>{isSubmitting ? 'Wait' : 'Save'}</Button>
-              </Alert>
+                {isSubmitting ? 'Wait' : 'Save'}
+              </Button>
             </div>
           </form>
         </Form>
