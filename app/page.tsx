@@ -25,6 +25,8 @@ import { z } from 'zod';
 import Link from 'next/link';
 import { useState } from 'react';
 import { signIn } from '@/lib/firebase/authLogin';
+import { useRouter } from 'next/navigation';
+import IsAuth from '@/components/IsAuth';
 
 const formSchema = z.object({
   email: z.string().min(5, {
@@ -41,17 +43,18 @@ const formSchema = z.object({
     ),
 });
 
-export default function Home() {
+function Home() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
   const { isSubmitting } = form.formState;
-
   const [error, setError] = useState<boolean>(false);
+  const router = useRouter();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const res = await signIn(values.email, values.password);
     if (res) {
+      router.push('/dashboard');
       return setError(false);
     }
     return setError(true);
@@ -132,3 +135,5 @@ export default function Home() {
     </main>
   );
 }
+
+export default IsAuth(Home);

@@ -1,4 +1,5 @@
 'use client';
+import IsAuth from '@/components/IsAuth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { FaArrowLeft } from 'react-icons/fa';
 
 const ForgotPassword = () => {
   return (
@@ -20,7 +21,7 @@ const ForgotPassword = () => {
             href='/'
             className='opacity-80 mb-4 flex items-center gap-2'
           >
-            <FaArrowLeft /> Back to login page
+            <ChevronLeft /> Back to login page
           </Link>
           <CardTitle className='mb-4'>Forgot Password</CardTitle>
           <CardDescription>Please contact us if you forgot your password</CardDescription>
@@ -36,4 +37,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default IsAuth(ForgotPassword);
