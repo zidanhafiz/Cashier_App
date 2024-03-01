@@ -51,7 +51,7 @@ const Sidebar = () => {
               <Link
                 href={list.link}
                 className={cn(
-                  pathname === list.link && 'bg-primary text-white dark:text-black',
+                  pathname.includes(list.link) && 'bg-primary text-white dark:text-black',
                   'flex flex-col gap-2 items-center transition hover:bg-primary hover:text-white dark:hover:text-black py-3 px-5 w-[100px] rounded-full'
                 )}
               >
@@ -73,7 +73,7 @@ const Sidebar = () => {
             <Link
               href={list.link}
               className={cn(
-                pathname === list.link && 'bg-primary text-white dark:text-black',
+                pathname.includes(list.link) && 'bg-primary text-white dark:text-black',
                 'flex gap-4 items-center transition hover:bg-primary hover:text-white dark:hover:text-black p-4 rounded-full'
               )}
             >
