@@ -24,3 +24,6 @@ export const showNotify = ({ type, message }: ShowNotify) => {
     transition: Bounce,
   });
 };
+export const toRupiah = (number: number) => {
+  return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+};
