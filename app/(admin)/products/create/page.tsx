@@ -232,7 +232,7 @@ const Create = () => {
             <div className='flex gap-3 pt-6 justify-end'>
               <Button
                 type='reset'
-                className='bg-red-500 hover:bg-red-600'
+                className='bg-red-500 hover:bg-red-600 text-white'
                 onClick={resetHandler}
                 disabled={form.formState.isSubmitting}
               >
