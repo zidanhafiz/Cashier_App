@@ -30,7 +30,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import {
   createProduct,
-  getAllProducts,
+  getCategories,
   uploadTempImage,
 } from '@/lib/firebase/productService';
 import { showAlert } from '@/components/Alert';
@@ -117,10 +117,9 @@ const Create = () => {
   };
 
   useEffect(() => {
-    getAllProducts()
+    getCategories()
       .then((res) => {
-        const data = res.map((cat) => cat.category);
-        setCategories(data);
+        setCategories(res);
       })
       .catch((err) => console.error(err));
   }, []);

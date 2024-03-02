@@ -60,6 +60,22 @@ export const getAllProducts = async () => {
   }
 };
 
+export const getCategories = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'products'));
+    const categoriesSet = new Set(); // Create a Set to store unique categories
+
+    querySnapshot.forEach((doc) => {
+      categoriesSet.add(doc.data().category); // Add category to the Set
+    });
+    const categories = Array.from(categoriesSet); // Convert Set to array
+
+    return categories as string[];
+  } catch (error) {
+    throw Error('Error get categories');
+  }
+};
+
 export const deleteProductById = async (id: string) => {
   const imageRef = ref(storage, `products/${id}`);
 
