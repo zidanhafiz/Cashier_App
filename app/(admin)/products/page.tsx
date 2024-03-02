@@ -1,50 +1,268 @@
 'use client';
 import SearchForm from '@/components/SearchForm';
 import { Button } from '@/components/ui/button';
-import { getAllProducts } from '@/lib/firebase/productService';
+import { deleteProductById, getAllProducts } from '@/lib/firebase/productService';
 import { DocumentData } from 'firebase/firestore';
-import { Plus } from 'lucide-react';
-import Image from 'next/image';
+import { Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Card } from '@/components/ui/card';
+import DialogModal from '@/components/DialogModal';
+import { showNotify, toRupiah } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useAlert } from '@/context/AlertProvider';
+import { showAlert } from '@/components/Alert';
+
+type CheckedItem = {
+  id: string;
+  checked: boolean;
+};
+
+const deleteMessage = (itemsLength?: number) => {
+  const title = itemsLength ? `Delete ${itemsLength} products?` : 'Delete this product?';
+
+  return {
+    title,
+    description: 'Are you sure?',
+    cancel: 'Cancel',
+    continue: 'Yes',
+  };
+};
 
 const Products = () => {
   const [products, setProducts] = useState<DocumentData[] | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [dialogModal, setDialogModal] = useState<ReactNode>(null);
+  const [checkedItems, setCheckedItems] = useState<CheckedItem[]>([]);
+  const [isSelect, setIsSelect] = useState<boolean>(false);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
 
+  const { showAlertHandle } = useAlert();
+
+  const checkedItemsLength = checkedItems.filter((item) => item.checked).length;
+
+  // Fetch function for get all products
+  const fetch = async () => {
+    try {
+      const res = await getAllProducts();
+      setProducts(res);
+      const items = res.map((data) => ({ id: data.id, checked: false }));
+      setCheckedItems(items);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Fetching and set products state
   useEffect(() => {
-    getAllProducts()
-      .then((res) => setProducts(res))
-      .catch((err) => console.error(err));
+    fetch();
   }, []);
 
-  return (
-    <div className='relative'>
-      <SearchForm />
-      <h1>Products</h1>
-      {products && (
-        <ul>
-          {products.map((product) => (
-            <li key={product.id}>
-              <Image
-                src={product.image}
-                width={200}
-                height={200}
-                alt='image'
-              />
-              <span>{product.name}</span>
-              <span>{product.description}</span>
-              <span>{product.price}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-      <Button asChild>
-        <Link href='/products/create'>
-          <Plus />
-        </Link>
-      </Button>
-    </div>
-  );
+  // Effect for mobile or desktop
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Function for trigger dialog modal for each product list
+  const openModalHandle = (product: DocumentData) => {
+    setOpenModal(true);
+    setDialogModal(
+      <DialogModal
+        open={openModal}
+        setOpen={setOpenModal}
+        product={product}
+        deleteHandle={dialogDeleteHandle}
+      />
+    );
+  };
+
+  // Function for toggling isSelect state
+  const setSelectHandle = () => {
+    setIsSelect(!isSelect);
+  };
+
+  // Function or handler for delete button on dialog modal
+  const dialogDeleteHandle = async (id: string) => {
+    await showAlert(deleteMessage(), 'discard', showAlertHandle);
+
+    try {
+      await deleteProductById(id);
+      showNotify({
+        type: 'success',
+        message: 'Product Deleted!',
+      });
+
+      // Refetch products again
+      fetch();
+    } catch (err) {
+      showNotify({
+        type: 'error',
+        message: err as string,
+      });
+      console.error(err);
+    }
+  };
+
+
+  // Function or handler for deleting selected products
+  const deleteSelectedProducts = async () => {
+    if (checkedItemsLength > 0) {
+      await showAlert(deleteMessage(checkedItemsLength), 'discard', showAlertHandle);
+
+      checkedItems.map(async (item) => {
+        if (item.checked) {
+          try {
+            await deleteProductById(item.id);
+
+            // Refetch products again
+            fetch();
+          } catch (err) {
+            console.error(err);
+            showNotify({
+              type: 'error',
+              message: `Error delete product ${item.id}`,
+            });
+          }
+        }
+      });
+
+      showNotify({
+        type: 'success',
+        message: `Products deleted!`,
+      });
+    }
+  };
+
+  const checkAllProductsHandle = () => {
+    setSelectAll(!selectAll);
+    setCheckedItems((prevState) => {
+      return prevState.map((item) => {
+        return { ...item, checked: !selectAll };
+      });
+    });
+  };
+
+  const checkedItemsHandle = (id: string) => {
+    setSelectAll(false);
+    setCheckedItems((prevState) => {
+      return prevState.map((item) => {
+        if (item.id === id) {
+          return { ...item, checked: !item.checked };
+        }
+        return item;
+      });
+    });
+  };
+
+  if (isMobile)
+    return (
+      <div className='relative'>
+        <SearchForm />
+        {openModal && dialogModal}
+        <Card className='mt-6'>
+          <div className='flex justify-between px-4 py-3'>
+            <Button
+              variant='link'
+              onClick={setSelectHandle}
+            >
+              Select
+            </Button>
+            <Button
+              className='bg-red-500 hover:bg-red-600 text-white space-x-2 rounded-lg'
+              onClick={deleteSelectedProducts}
+              disabled={checkedItemsLength === 0}
+            >
+              <Trash2 size={18} />
+              <span>Delete</span>
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {isSelect ? (
+                  <TableHead className='text-center'>
+                    <Checkbox
+                      checked={selectAll}
+                      onCheckedChange={checkAllProductsHandle}
+                    />
+                  </TableHead>
+                ) : (
+                  <TableHead className='text-center'>No</TableHead>
+                )}
+                <TableHead className=''>Product</TableHead>
+                <TableHead className='text-right'>Stock</TableHead>
+                <TableHead className='text-right'>Price</TableHead>
+                <TableHead className='text-center'>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products &&
+                products.map((product, i) => (
+                  <TableRow key={product.id}>
+                    {isSelect ? (
+                      <TableCell className='font-medium text-center'>
+                        <Checkbox
+                          checked={checkedItems[i].checked}
+                          onCheckedChange={() => {
+                            checkedItemsHandle(product.id);
+                          }}
+                        />
+                      </TableCell>
+                    ) : (
+                      <TableCell className='text-center'>{i + 1}</TableCell>
+                    )}
+                    <TableCell className='w-40'>{product.name}</TableCell>
+                    <TableCell className='text-right'>{product.stock}</TableCell>
+                    <TableCell className='text-right'>
+                      {toRupiah(product.price)}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        className='w-fit p-3 rounded-lg text-white bg-slate-800 hover:bg-slate-700'
+                        onClick={() => openModalHandle(product)}
+                      >
+                        Detail
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell>Total</TableCell>
+                <TableCell className='text-right'>$2,500.00</TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </Card>
+
+        <Button
+          asChild
+          className='fixed z-20 shadow-lg bottom-28 right-6 w-[80px] h-[80px]'
+        >
+          <Link href='/products/create'>
+            <Plus size={56} />
+          </Link>
+        </Button>
+      </div>
+    );
 };
 
 export default Products;

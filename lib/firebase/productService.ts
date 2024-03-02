@@ -1,6 +1,13 @@
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from './firebase';
-import { doc, collection, setDoc, getDocs, DocumentData } from 'firebase/firestore';
+import {
+  doc,
+  collection,
+  setDoc,
+  getDocs,
+  DocumentData,
+  deleteDoc,
+} from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 
 export const uploadTempImage = async (image: File) => {
@@ -40,12 +47,24 @@ export const createProduct = async (data: DocumentData) => {
 export const getAllProducts = async () => {
   const data: DocumentData[] = [];
   try {
-    const querySnapshot = await getDocs(collection(db, 'products'));
-    querySnapshot.forEach((doc) => {
-      data.push(doc.data());
+    const snapshot = await getDocs(collection(db, 'products'));
+    snapshot.forEach((doc) => {
+      data.push({ ...doc.data(), id: doc.id });
     });
     return data;
   } catch (err) {
     throw Error('Error get data');
+  }
+};
+
+export const deleteProductById = async (id: string) => {
+  const imageRef = ref(storage, `products/${id}`);
+
+  try {
+    await deleteDoc(doc(db, 'products', id));
+    await deleteObject(imageRef);
+    return;
+  } catch (err) {
+    throw Error('Error delete product');
   }
 };

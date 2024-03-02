@@ -11,6 +11,8 @@ import {
 interface AlertContextType {
   openAlert: boolean;
   setOpenAlert: Dispatch<SetStateAction<boolean>>;
+  alert: ReactNode;
+  setAlert: Dispatch<SetStateAction<ReactNode>>;
   showAlertHandle: (Comp: ReactNode) => void;
 }
 
@@ -33,7 +35,7 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
     setOpenAlert(true);
   };
 
-  const value = { openAlert, setOpenAlert, showAlertHandle };
+  const value = { openAlert, setOpenAlert, alert, setAlert, showAlertHandle };
 
   return (
     <AlertContext.Provider value={value}>

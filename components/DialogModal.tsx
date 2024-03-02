@@ -8,16 +8,18 @@ import { Button } from './ui/button';
 import { DocumentData } from 'firebase/firestore';
 import Image from 'next/image';
 import { Dispatch, SetStateAction } from 'react';
-import { FilePenLine, Pencil, Trash2 } from 'lucide-react';
+import { FilePenLine, Trash2 } from 'lucide-react';
 import { toRupiah } from '@/lib/utils';
+import Link from 'next/link';
 
 type Props = {
-  product: any;
+  product: DocumentData;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  deleteHandle: (id: string) => void;
 };
 
-export default function DialogModal({ product, open, setOpen }: Props) {
+export default function DialogModal({ product, open, setOpen, deleteHandle }: Props) {
   return (
     <Dialog
       open={open}
@@ -51,6 +53,7 @@ export default function DialogModal({ product, open, setOpen }: Props) {
           <Button
             size='lg'
             className='flex gap-2 bg-red-500 hover:bg-red-600 text-white'
+            onClick={() => deleteHandle(product.id)}
           >
             <Trash2 size={20} /> Delete
           </Button>
@@ -58,8 +61,11 @@ export default function DialogModal({ product, open, setOpen }: Props) {
             size='lg'
             className='flex gap-2'
             variant='outline'
+            asChild
           >
-            <FilePenLine size={20} /> Edit
+            <Link href={`/products/${product.id}`}>
+              <FilePenLine size={20} /> Edit
+            </Link>
           </Button>
         </DialogFooter>
       </DialogContent>
