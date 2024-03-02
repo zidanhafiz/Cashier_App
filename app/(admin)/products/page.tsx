@@ -88,7 +88,7 @@ const Products = () => {
         open={openModal}
         setOpen={setOpenModal}
         product={product}
-        deleteHandle={dialogDeleteHandle}
+        deleteHandle={deleteButtonHandle}
       />
     );
   };
@@ -99,7 +99,7 @@ const Products = () => {
   };
 
   // Function or handler for delete button on dialog modal
-  const dialogDeleteHandle = async (id: string) => {
+  const deleteButtonHandle = async (id: string) => {
     await showAlert(deleteMessage(), 'discard', showAlertHandle);
 
     try {
@@ -119,7 +119,6 @@ const Products = () => {
       console.error(err);
     }
   };
-
 
   // Function or handler for deleting selected products
   const deleteSelectedProducts = async () => {
@@ -263,6 +262,108 @@ const Products = () => {
         </Button>
       </div>
     );
+
+  // Desktop view
+  return (
+    <div>
+      <div className='flex gap-8 justify-between'>
+        <SearchForm />
+        <Button
+          asChild
+          className='shadow-lg space-x-2 rounded-lg'
+        >
+          <Link href='/products/create'>
+            <Plus size={24} /> <span>Add Product</span>
+          </Link>
+        </Button>
+      </div>
+      {openModal && dialogModal}
+      <Card className='mt-6'>
+        <div className='flex justify-between px-4 py-3'>
+          <Button
+            variant='link'
+            onClick={setSelectHandle}
+          >
+            Select
+          </Button>
+          <Button
+            className='bg-red-500 hover:bg-red-600 text-white space-x-2 rounded-lg'
+            onClick={deleteSelectedProducts}
+            disabled={checkedItemsLength === 0}
+          >
+            <Trash2 size={18} />
+            <span>Delete</span>
+          </Button>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {isSelect ? (
+                <TableHead className='text-center'>
+                  <Checkbox
+                    checked={selectAll}
+                    onCheckedChange={checkAllProductsHandle}
+                  />
+                </TableHead>
+              ) : (
+                <TableHead className='text-center'>No</TableHead>
+              )}
+              <TableHead className=''>Product</TableHead>
+              <TableHead className=''>Description</TableHead>
+              <TableHead className=''>Category</TableHead>
+              <TableHead className='text-right'>Stock</TableHead>
+              <TableHead className='text-right'>Price</TableHead>
+              <TableHead className='text-center'>Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {products &&
+              products.map((product, i) => (
+                <TableRow key={product.id}>
+                  {isSelect ? (
+                    <TableCell className='font-medium text-center'>
+                      <Checkbox
+                        checked={checkedItems[i].checked}
+                        onCheckedChange={() => {
+                          checkedItemsHandle(product.id);
+                        }}
+                      />
+                    </TableCell>
+                  ) : (
+                    <TableCell className='text-center'>{i + 1}</TableCell>
+                  )}
+                  <TableCell className=''>{product.name}</TableCell>
+                  <TableCell className=''>{product.description}</TableCell>
+                  <TableCell className='w-40'>{product.category}</TableCell>
+                  <TableCell className='text-right'>{product.stock}</TableCell>
+                  <TableCell className='text-right'>{toRupiah(product.price)}</TableCell>
+                  <TableCell className='text-center space-x-2'>
+                    <Button
+                      className='w-fit p-3 rounded-lg text-white bg-slate-800 hover:bg-slate-700'
+                      onClick={() => openModalHandle(product)}
+                    >
+                      Detail
+                    </Button>
+                    <Button
+                      className='w-fit p-3 rounded-lg text-white bg-red-500 hover:bg-red-600'
+                      onClick={() => deleteButtonHandle(product.id)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell>Total</TableCell>
+              <TableCell className='text-right'>$2,500.00</TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </Card>
+    </div>
+  );
 };
 
 export default Products;
