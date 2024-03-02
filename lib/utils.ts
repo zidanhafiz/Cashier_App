@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Bounce, toast } from 'react-toastify';
+import { Timestamp } from 'firebase/firestore';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,4 +27,14 @@ export const showNotify = ({ type, message }: ShowNotify) => {
 };
 export const toRupiah = (number: number) => {
   return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+};
+
+export const formatDate = (timestamp: Timestamp) => {
+  const date = timestamp.toDate();
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 };

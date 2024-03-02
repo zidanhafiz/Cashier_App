@@ -7,6 +7,7 @@ import {
   getDocs,
   DocumentData,
   deleteDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 
@@ -24,7 +25,7 @@ export const uploadTempImage = async (image: File) => {
 
 export const createProduct = async (data: DocumentData) => {
   const id = nanoid();
-  const { name, description, price, stock, image } = data;
+  const { name, description, category, price, stock, image } = data;
 
   const imageRef = ref(storage, `products/${id}`);
 
@@ -35,9 +36,11 @@ export const createProduct = async (data: DocumentData) => {
     await setDoc(doc(db, 'products', id), {
       name,
       description,
+      category,
       price,
       stock,
       image: imageUrl,
+      createdAt: serverTimestamp(),
     });
   } catch (error: any) {
     throw Error(error);

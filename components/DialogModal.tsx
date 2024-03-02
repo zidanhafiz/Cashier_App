@@ -9,8 +9,9 @@ import { DocumentData } from 'firebase/firestore';
 import Image from 'next/image';
 import { Dispatch, SetStateAction } from 'react';
 import { FilePenLine, Trash2 } from 'lucide-react';
-import { toRupiah } from '@/lib/utils';
+import { formatDate, toRupiah } from '@/lib/utils';
 import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
 
 type Props = {
   product: DocumentData;
@@ -27,6 +28,7 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
     >
       <DialogContent className='sm:max-w-[425px]'>
         <DialogDescription className='flex flex-col items-center gap-6'>
+          <p className='mt-1'>{formatDate(product.createdAt)}</p>
           <Image
             src={product.image}
             width={300}
@@ -34,22 +36,21 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
             alt={product.name}
             className='w-[230px] shadow-lg rounded-xl'
           />
-          <div className='flex flex-col'>
-            <div className='flex items-start gap-20'>
-              <div>
-                <h2 className='text-xl text-slate-800 dark:text-white font-semibold'>
-                  {product.name}
-                </h2>
-                <p>{product.description}</p>
-              </div>
-              <p className='text-xl text-slate-800 dark:text-white font-semibold'>
-                {toRupiah(product.price)}
-              </p>
+          <div className='flex flex-col text-slate-800 dark:text-white'>
+            <div className='flex items-start justify-between gap-8'>
+              <h2 className='text-xl font-semibold'>{product.name}</h2>
+              <p className='text-xl font-semibold'>{toRupiah(product.price)}</p>
             </div>
-            <p className='mt-2'>Stock : {product.stock}</p>
+            <Separator
+              orientation='horizontal'
+              className='my-2'
+            />
+            <p>{product.description}</p>
+            <p className='mt-4'>Category: {product.category}</p>
+            <p className='mt-1'>Stock: {product.stock}</p>
           </div>
         </DialogDescription>
-        <DialogFooter className='mt-6 flex flex-row justify-center gap-4'>
+        <div className='flex justify-center gap-4 mt-4'>
           <Button
             size='lg'
             className='flex gap-2 bg-red-500 hover:bg-red-600 text-white'
@@ -59,15 +60,14 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
           </Button>
           <Button
             size='lg'
-            className='flex gap-2'
-            variant='outline'
+            className='flex gap-2 bg-slate-800 hover:bg-slate'
             asChild
           >
             <Link href={`/products/${product.id}`}>
               <FilePenLine size={20} /> Edit
             </Link>
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
