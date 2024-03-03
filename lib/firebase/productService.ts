@@ -8,6 +8,9 @@ import {
   DocumentData,
   deleteDoc,
   serverTimestamp,
+  query,
+  orderBy,
+  OrderByDirection,
 } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 
@@ -34,9 +37,9 @@ export const createProduct = async (data: DocumentData) => {
     const imageUrl = await getDownloadURL(imageRef);
 
     await setDoc(doc(db, 'products', id), {
-      name,
+      name: name.toLowerCase(),
       description,
-      category,
+      category: category.toLowerCase(),
       price,
       stock,
       image: imageUrl,
@@ -47,14 +50,36 @@ export const createProduct = async (data: DocumentData) => {
   }
 };
 
-export const getAllProducts = async () => {
-  const data: DocumentData[] = [];
+export const getAllProducts = async (search: string, category: string, sort: string) => {
+  const getSortQuery = (): [string, OrderByDirection] => {
+    if (sort === 'asc') {
+      return ['name', 'asc'];
+    } else if (sort === 'desc') {
+      return ['name', 'desc'];
+    } else if (sort === 'highest') {
+      return ['price', 'desc'];
+    } else {
+      return ['price', 'asc'];
+    }
+  };
+
+  const sortValue = getSortQuery();
+  const categoryValue = category === 'all' ? '' : category;
+
+  const col = collection(db, 'products');
+
+  const q = query(col, orderBy(sortValue[0], sortValue[1]));
+
   try {
-    const snapshot = await getDocs(collection(db, 'products'));
+    const data: DocumentData[] = [];
+    const snapshot = await getDocs(q);
     snapshot.forEach((doc) => {
       data.push({ ...doc.data(), id: doc.id });
     });
-    return data;
+
+    const nameFiltered = data.filter((item) => item.name.includes(search));
+
+    return nameFiltered.filter((item) => item.category.includes(categoryValue));
   } catch (err) {
     throw Error('Error get data');
   }
