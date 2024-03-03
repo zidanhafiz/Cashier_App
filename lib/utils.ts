@@ -38,3 +38,9 @@ export const formatDate = (timestamp: Timestamp) => {
     year: 'numeric',
   });
 };
+
+export const capitalizeFirstWord = (str: string) => {
+  return str.replace(/\b\w/g, (char) => {
+    return char.toUpperCase();
+  });
+};
