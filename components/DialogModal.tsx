@@ -1,15 +1,10 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import { DocumentData } from 'firebase/firestore';
 import Image from 'next/image';
 import { Dispatch, SetStateAction } from 'react';
 import { FilePenLine, Trash2 } from 'lucide-react';
-import { formatDate, toRupiah } from '@/lib/utils';
+import { capitalizeFirstWord, formatDate, toRupiah } from '@/lib/utils';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 
@@ -38,7 +33,9 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
           />
           <div className='flex flex-col text-slate-800 dark:text-white'>
             <div className='flex items-start justify-between gap-8'>
-              <h2 className='text-xl font-semibold'>{product.name}</h2>
+              <h2 className='text-xl font-semibold'>
+                {capitalizeFirstWord(product.name)}
+              </h2>
               <p className='text-xl font-semibold'>{toRupiah(product.price)}</p>
             </div>
             <Separator
@@ -46,7 +43,7 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
               className='my-2'
             />
             <p>{product.description}</p>
-            <p className='mt-4'>Category: {product.category}</p>
+            <p className='mt-4'>Category: {capitalizeFirstWord(product.category)}</p>
             <p className='mt-1'>Stock: {product.stock}</p>
           </div>
         </DialogDescription>

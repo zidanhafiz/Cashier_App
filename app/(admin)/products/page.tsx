@@ -17,11 +17,11 @@ import {
 } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
 import DialogModal from '@/components/DialogModal';
-import { showNotify, toRupiah } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+import { capitalizeFirstWord, showNotify, toRupiah } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAlert } from '@/context/AlertProvider';
 import { showAlert } from '@/components/Alert';
+import { useSearchParams } from 'next/navigation';
 
 type CheckedItem = {
   id: string;
@@ -48,14 +48,21 @@ const Products = () => {
   const [isSelect, setIsSelect] = useState<boolean>(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
 
+  const searchParams = useSearchParams();
+  const [search, category, sort] = [
+    searchParams.get('search') || '',
+    searchParams.get('category') || 'all',
+    searchParams.get('sort') || 'asc',
+  ];
+
   const { showAlertHandle } = useAlert();
 
   const checkedItemsLength = checkedItems.filter((item) => item.checked).length;
 
   // Fetch function for get all products
-  const fetch = async () => {
+  const fetch = async (search: string, category: string, sort: string) => {
     try {
-      const res = await getAllProducts();
+      const res = await getAllProducts(search, category, sort);
       setProducts(res);
       const items = res.map((data) => ({ id: data.id, checked: false }));
       setCheckedItems(items);
@@ -66,8 +73,8 @@ const Products = () => {
 
   // Fetching and set products state
   useEffect(() => {
-    fetch();
-  }, []);
+    fetch(search, category, sort);
+  }, [search, category, sort]);
 
   // Effect for mobile or desktop
   useEffect(() => {
@@ -110,7 +117,7 @@ const Products = () => {
       });
 
       // Refetch products again
-      fetch();
+      fetch(search, category, sort);
     } catch (err) {
       showNotify({
         type: 'error',
@@ -131,7 +138,7 @@ const Products = () => {
             await deleteProductById(item.id);
 
             // Refetch products again
-            fetch();
+            fetch(search, category, sort);
           } catch (err) {
             console.error(err);
             showNotify({
@@ -227,7 +234,9 @@ const Products = () => {
                     ) : (
                       <TableCell className='text-center'>{i + 1}</TableCell>
                     )}
-                    <TableCell className='w-40'>{product.name}</TableCell>
+                    <TableCell className='w-40'>
+                      {capitalizeFirstWord(product.name)}
+                    </TableCell>
                     <TableCell className='text-right'>{product.stock}</TableCell>
                     <TableCell className='text-right'>
                       {toRupiah(product.price)}
@@ -332,9 +341,11 @@ const Products = () => {
                   ) : (
                     <TableCell className='text-center'>{i + 1}</TableCell>
                   )}
-                  <TableCell className=''>{product.name}</TableCell>
+                  <TableCell className=''>{capitalizeFirstWord(product.name)}</TableCell>
                   <TableCell className=''>{product.description}</TableCell>
-                  <TableCell className='w-40'>{product.category}</TableCell>
+                  <TableCell className='w-40'>
+                    {capitalizeFirstWord(product.category)}
+                  </TableCell>
                   <TableCell className='text-right'>{product.stock}</TableCell>
                   <TableCell className='text-right'>{toRupiah(product.price)}</TableCell>
                   <TableCell className='text-center space-x-2'>

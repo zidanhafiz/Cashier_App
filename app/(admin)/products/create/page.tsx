@@ -35,7 +35,7 @@ import {
 } from '@/lib/firebase/productService';
 import { showAlert } from '@/components/Alert';
 import { useAlert } from '@/context/AlertProvider';
-import { showNotify } from '@/lib/utils';
+import { capitalizeFirstWord, showNotify } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import {
   Select,
@@ -248,7 +248,7 @@ const Create = () => {
                                   key={cat}
                                   value={cat}
                                 >
-                                  {cat}
+                                  {capitalizeFirstWord(cat)}
                                 </SelectItem>
                               ))}
                             </SelectContent>
