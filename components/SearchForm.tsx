@@ -15,7 +15,7 @@ import { getCategories } from '@/lib/firebase/productService';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormField } from './ui/form';
+import { Form, FormControl, FormField, FormItem } from './ui/form';
 import { useRouter } from 'next/navigation';
 import { capitalizeFirstWord } from '@/lib/utils';
 
@@ -57,65 +57,75 @@ const SearchForm = () => {
   return (
     <Form {...form}>
       <form
-        className='flex gap-4'
+        className='flex justify-around gap-2 md:gap-4'
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField
           control={form.control}
           name='search'
           render={({ field }) => (
-            <Input
-              {...field}
-              type='text'
-              placeholder='Search Product'
-            />
+            <FormItem>
+              <FormControl>
+                <Input
+                  {...field}
+                  type='text'
+                  placeholder='Search Product'
+                />
+              </FormControl>
+            </FormItem>
           )}
         />
         <FormField
           control={form.control}
           name='category'
           render={({ field }) => (
-            <Select
-              {...field}
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <SelectTrigger className='w-[180px]'>
-                <SelectValue placeholder='Category' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>All</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem
-                    key={cat}
-                    value={cat}
-                  >
-                    {capitalizeFirstWord(cat)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FormItem>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger className='md:w-[180px] max-w-[180px]'>
+                    <SelectValue placeholder='Category' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value='all'>All</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem
+                      key={cat}
+                      value={cat}
+                    >
+                      {capitalizeFirstWord(cat)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormItem>
           )}
         />
         <FormField
           control={form.control}
           name='sort'
           render={({ field }) => (
-            <Select
-              {...field}
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <SelectTrigger className='w-[180px]'>
-                <SelectValue placeholder='Sort By' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='asc'>A-z</SelectItem>
-                <SelectItem value='desc'>Z-a</SelectItem>
-                <SelectItem value='lowest'>Lowest Price</SelectItem>
-                <SelectItem value='highest'>Highest Price</SelectItem>
-              </SelectContent>
-            </Select>
+            <FormItem>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger className='md:w-[180px] max-w-[180px]'>
+                    <SelectValue placeholder='Sort By' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value='asc'>A-z</SelectItem>
+                  <SelectItem value='desc'>Z-a</SelectItem>
+                  <SelectItem value='lowest'>Lowest Price</SelectItem>
+                  <SelectItem value='highest'>Highest Price</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormItem>
           )}
         />
         <Button
