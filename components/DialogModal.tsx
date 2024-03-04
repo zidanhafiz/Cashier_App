@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import { DocumentData } from 'firebase/firestore';
 import Image from 'next/image';
@@ -22,7 +22,7 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
       onOpenChange={setOpen}
     >
       <DialogContent className='sm:max-w-[425px]'>
-        <DialogDescription className='flex flex-col items-center gap-6'>
+        <div className='flex flex-col items-center gap-6'>
           <p className='mt-1'>{formatDate(product.createdAt)}</p>
           <Image
             src={product.image}
@@ -46,7 +46,7 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
             <p className='mt-4'>Category: {capitalizeFirstWord(product.category)}</p>
             <p className='mt-1'>Stock: {product.stock}</p>
           </div>
-        </DialogDescription>
+        </div>
         <div className='flex justify-center gap-4 mt-4'>
           <Button
             size='lg'
@@ -57,7 +57,7 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
           </Button>
           <Button
             size='lg'
-            className='flex gap-2 bg-slate-800 hover:bg-slate'
+            className='flex gap-2 bg-slate-800 hover:bg-slate-700 text-white'
             asChild
           >
             <Link href={`/products/${product.id}`}>
