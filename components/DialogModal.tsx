@@ -12,10 +12,17 @@ type Props = {
   product: DocumentData;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  deleteHandle: (id: string) => void;
+  deleteHandle?: (id: string) => void;
+  isDashboard: boolean;
 };
 
-export default function DialogModal({ product, open, setOpen, deleteHandle }: Props) {
+export default function DialogModal({
+  product,
+  open,
+  setOpen,
+  deleteHandle,
+  isDashboard,
+}: Props) {
   return (
     <Dialog
       open={open}
@@ -48,22 +55,34 @@ export default function DialogModal({ product, open, setOpen, deleteHandle }: Pr
           </div>
         </div>
         <div className='flex justify-center gap-4 mt-4'>
-          <Button
-            size='lg'
-            className='flex gap-2 bg-red-500 hover:bg-red-600 text-white'
-            onClick={() => deleteHandle(product.id)}
-          >
-            <Trash2 size={20} /> Delete
-          </Button>
-          <Button
-            size='lg'
-            className='flex gap-2 bg-slate-800 hover:bg-slate-700 text-white'
-            asChild
-          >
-            <Link href={`/products/${product.id}`}>
-              <FilePenLine size={20} /> Edit
-            </Link>
-          </Button>
+          {isDashboard ? (
+            <Button
+              size='lg'
+              className='flex gap-2 bg-slate-800 hover:bg-slate-700 text-white'
+              onClick={() => setOpen(false)}
+            >
+              Close
+            </Button>
+          ) : (
+            <>
+              <Button
+                size='lg'
+                className='flex gap-2 bg-red-500 hover:bg-red-600 text-white'
+                onClick={() => deleteHandle && deleteHandle(product.id)}
+              >
+                <Trash2 size={20} /> Delete
+              </Button>
+              <Button
+                size='lg'
+                className='flex gap-2 bg-slate-800 hover:bg-slate-700 text-white'
+                asChild
+              >
+                <Link href={`/products/${product.id}`}>
+                  <FilePenLine size={20} /> Edit
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

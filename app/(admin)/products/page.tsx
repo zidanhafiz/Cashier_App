@@ -96,6 +96,7 @@ const Products = () => {
         setOpen={setOpenModal}
         product={product}
         deleteHandle={deleteButtonHandle}
+        isDashboard={false}
       />
     );
   };
