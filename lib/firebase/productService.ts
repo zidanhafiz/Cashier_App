@@ -11,6 +11,8 @@ import {
   query,
   orderBy,
   OrderByDirection,
+  getDoc,
+  updateDoc,
 } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 
@@ -85,6 +87,19 @@ export const getAllProducts = async (search: string, category: string, sort: str
   }
 };
 
+export const getProductById = async (id: string) => {
+  try {
+    const snapshot = await getDoc(doc(db, 'products', id));
+    const data: DocumentData = {
+      id: snapshot.id,
+      ...snapshot.data(),
+    };
+    return data;
+  } catch (err) {
+    throw Error(`Error get Product with id: ${id}`);
+  }
+};
+
 export const getCategories = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, 'products'));
@@ -110,5 +125,42 @@ export const deleteProductById = async (id: string) => {
     return;
   } catch (err) {
     throw Error('Error delete product');
+  }
+};
+
+export const updateProductById = async (id: string, document: DocumentData) => {
+  const docRef = doc(db, 'products', id);
+  const imageRef = ref(storage, `products/${id}`);
+
+  const getUpdateProduct = async () => {
+    if (document.image !== undefined) {
+      await uploadBytes(imageRef, document.image);
+      const imgUrl = await getDownloadURL(imageRef);
+
+      const data = {
+        ...document,
+        image: imgUrl,
+      };
+
+      return data;
+    }
+
+    const { name, description, category, price, stock } = document;
+    return {
+      id,
+      name,
+      description,
+      category,
+      price,
+      stock,
+    };
+  };
+
+  try {
+    const updatedProduct = await getUpdateProduct();
+    await updateDoc(docRef, updatedProduct);
+    return;
+  } catch (err) {
+    throw Error('Error update product!');
   }
 };
