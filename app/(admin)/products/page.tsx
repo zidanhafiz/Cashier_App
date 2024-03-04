@@ -180,7 +180,7 @@ const Products = () => {
   if (isMobile)
     return (
       <div className='relative'>
-        <SearchForm />
+        <SearchForm path='/products' />
         {openModal && dialogModal}
         <Card className='mt-6'>
           <div className='flex justify-between px-4 py-3'>
@@ -276,7 +276,7 @@ const Products = () => {
   return (
     <div>
       <div className='flex gap-8 justify-between'>
-        <SearchForm />
+        <SearchForm path='products' />
         <Button
           asChild
           className='shadow-lg space-x-2 rounded-lg'

@@ -25,7 +25,7 @@ const FormSchema = z.object({
   sort: z.string(),
 });
 
-const SearchForm = () => {
+const SearchForm = ({ path }: { path: string }) => {
   const [categories, setCategories] = useState<string[]>([]);
 
   const router = useRouter();
@@ -50,7 +50,7 @@ const SearchForm = () => {
   const onSubmit = (values: z.infer<typeof FormSchema>) => {
     const { search, category, sort } = values;
     router.push(
-      `/products?search=${search.toLowerCase()}&category=${category}&sort=${sort}`
+      `${path}?search=${search.toLowerCase()}&category=${category}&sort=${sort}`
     );
   };
 
