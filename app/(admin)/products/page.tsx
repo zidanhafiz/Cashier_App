@@ -10,7 +10,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -22,6 +21,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAlert } from '@/context/AlertProvider';
 import { showAlert } from '@/components/Alert';
 import { useSearchParams } from 'next/navigation';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type CheckedItem = {
   id: string;
@@ -200,71 +200,68 @@ const Products = () => {
               <span>Delete</span>
             </Button>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {isSelect ? (
-                  <TableHead className='text-center'>
-                    <Checkbox
-                      checked={selectAll}
-                      onCheckedChange={checkAllProductsHandle}
-                    />
-                  </TableHead>
-                ) : (
-                  <TableHead className='text-center'>No</TableHead>
-                )}
-                <TableHead className=''>Product</TableHead>
-                <TableHead className='text-right'>Stock</TableHead>
-                <TableHead className='text-right'>Price</TableHead>
-                <TableHead className='text-center'>Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products &&
-                products.map((product, i) => (
-                  <TableRow key={product.id}>
-                    {isSelect ? (
-                      <TableCell className='font-medium text-center'>
-                        <Checkbox
-                          checked={checkedItems[i].checked}
-                          onCheckedChange={() => {
-                            checkedItemsHandle(product.id);
-                          }}
-                        />
+          <ScrollArea className='h-[540px]'>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {isSelect ? (
+                    <TableHead className='text-center'>
+                      <Checkbox
+                        checked={selectAll}
+                        onCheckedChange={checkAllProductsHandle}
+                      />
+                    </TableHead>
+                  ) : (
+                    <TableHead className='text-center'>No</TableHead>
+                  )}
+                  <TableHead className=''>Product</TableHead>
+                  <TableHead className='text-right'>Stock</TableHead>
+                  <TableHead className='text-right'>Price</TableHead>
+                  <TableHead className='text-center'>Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {products &&
+                  products.map((product, i) => (
+                    <TableRow key={product.id}>
+                      {isSelect ? (
+                        <TableCell className='font-medium text-center'>
+                          <Checkbox
+                            checked={checkedItems[i].checked}
+                            onCheckedChange={() => {
+                              checkedItemsHandle(product.id);
+                            }}
+                          />
+                        </TableCell>
+                      ) : (
+                        <TableCell className='text-center'>{i + 1}</TableCell>
+                      )}
+                      <TableCell className='w-40'>
+                        {capitalizeFirstWord(product.name)}
                       </TableCell>
-                    ) : (
-                      <TableCell className='text-center'>{i + 1}</TableCell>
-                    )}
-                    <TableCell className='w-40'>
-                      {capitalizeFirstWord(product.name)}
-                    </TableCell>
-                    <TableCell className='text-right'>{product.stock}</TableCell>
-                    <TableCell className='text-right'>
-                      {toRupiah(product.price)}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        className='w-fit p-3 rounded-lg text-white bg-slate-800 hover:bg-slate-700'
-                        onClick={() => openModalHandle(product)}
-                      >
-                        Detail
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell>Total</TableCell>
-                <TableCell className='text-right'>$2,500.00</TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
+                      <TableCell className='text-right'>{product.stock}</TableCell>
+                      <TableCell className='text-right'>
+                        {toRupiah(product.price)}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          className='w-fit p-3 rounded-lg text-white bg-slate-800 hover:bg-slate-700'
+                          onClick={() => openModalHandle(product)}
+                        >
+                          Detail
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
+          <div className='text-center w-full p-4'>Page 1</div>
         </Card>
 
         <Button
           asChild
-          className='fixed z-20 shadow-lg bottom-28 right-6 w-[80px] h-[80px]'
+          className='fixed z-20 shadow-lg bottom-24 right-6 w-[80px] h-[80px]'
         >
           <Link href='/products/create'>
             <Plus size={56} />
@@ -305,74 +302,75 @@ const Products = () => {
             <span>Delete</span>
           </Button>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {isSelect ? (
-                <TableHead className='text-center'>
-                  <Checkbox
-                    checked={selectAll}
-                    onCheckedChange={checkAllProductsHandle}
-                  />
-                </TableHead>
-              ) : (
-                <TableHead className='text-center'>No</TableHead>
-              )}
-              <TableHead className=''>Product</TableHead>
-              <TableHead className=''>Description</TableHead>
-              <TableHead className=''>Category</TableHead>
-              <TableHead className='text-right'>Stock</TableHead>
-              <TableHead className='text-right'>Price</TableHead>
-              <TableHead className='text-center'>Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products &&
-              products.map((product, i) => (
-                <TableRow key={product.id}>
-                  {isSelect ? (
-                    <TableCell className='font-medium text-center'>
-                      <Checkbox
-                        checked={checkedItems[i].checked}
-                        onCheckedChange={() => {
-                          checkedItemsHandle(product.id);
-                        }}
-                      />
+        <ScrollArea className='h-screen max-h-[600px] w-full'>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {isSelect ? (
+                  <TableHead className='text-center'>
+                    <Checkbox
+                      checked={selectAll}
+                      onCheckedChange={checkAllProductsHandle}
+                    />
+                  </TableHead>
+                ) : (
+                  <TableHead className='text-center'>No</TableHead>
+                )}
+                <TableHead className=''>Product</TableHead>
+                <TableHead className=''>Description</TableHead>
+                <TableHead className='w-40'>Category</TableHead>
+                <TableHead className='text-right'>Stock</TableHead>
+                <TableHead className='text-right'>Price</TableHead>
+                <TableHead className='text-center'>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products &&
+                products.map((product, i) => (
+                  <TableRow key={product.id}>
+                    {isSelect ? (
+                      <TableCell className='font-medium text-center'>
+                        <Checkbox
+                          checked={checkedItems[i].checked}
+                          onCheckedChange={() => {
+                            checkedItemsHandle(product.id);
+                          }}
+                        />
+                      </TableCell>
+                    ) : (
+                      <TableCell className='text-center'>{i + 1}</TableCell>
+                    )}
+                    <TableCell className=''>
+                      {capitalizeFirstWord(product.name)}
                     </TableCell>
-                  ) : (
-                    <TableCell className='text-center'>{i + 1}</TableCell>
-                  )}
-                  <TableCell className=''>{capitalizeFirstWord(product.name)}</TableCell>
-                  <TableCell className=''>{product.description}</TableCell>
-                  <TableCell className='w-40'>
-                    {capitalizeFirstWord(product.category)}
-                  </TableCell>
-                  <TableCell className='text-right'>{product.stock}</TableCell>
-                  <TableCell className='text-right'>{toRupiah(product.price)}</TableCell>
-                  <TableCell className='text-center space-x-2'>
-                    <Button
-                      className='w-fit p-3 rounded-lg text-white bg-slate-800 hover:bg-slate-700'
-                      onClick={() => openModalHandle(product)}
-                    >
-                      Detail
-                    </Button>
-                    <Button
-                      className='w-fit p-3 rounded-lg text-white bg-red-500 hover:bg-red-600'
-                      onClick={() => deleteButtonHandle(product.id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell>Total</TableCell>
-              <TableCell className='text-right'>$2,500.00</TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table>
+                    <TableCell className=''>{product.description}</TableCell>
+                    <TableCell className='w-40'>
+                      {capitalizeFirstWord(product.category)}
+                    </TableCell>
+                    <TableCell className='text-right'>{product.stock}</TableCell>
+                    <TableCell className='text-right'>
+                      {toRupiah(product.price)}
+                    </TableCell>
+                    <TableCell className='text-center space-x-2'>
+                      <Button
+                        className='w-fit p-3 rounded-lg text-white bg-slate-800 hover:bg-slate-700'
+                        onClick={() => openModalHandle(product)}
+                      >
+                        Detail
+                      </Button>
+                      <Button
+                        className='w-fit p-3 rounded-lg text-white bg-red-500 hover:bg-red-600'
+                        onClick={() => deleteButtonHandle(product.id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </ScrollArea>
+        <div className='p-4 w-full text-center'>Page 1</div>
       </Card>
     </div>
   );
