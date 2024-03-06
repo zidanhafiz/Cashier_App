@@ -77,3 +77,35 @@ export const deleteAllCartList = async (productCart: ProductCart[]) => {
     }
   });
 };
+
+export const updateCartList = async (
+  id: string,
+  quantity: number,
+  totalPrice: number
+) => {
+  const docRef = doc(db, 'cart', id);
+
+  if (quantity < 1) {
+    throw Error('Quantity at least is 1');
+  }
+
+  try {
+    await updateDoc(docRef, {
+      quantity: quantity,
+      totalPrice: totalPrice,
+    });
+    return;
+  } catch (err) {
+    throw Error('Error update product!');
+  }
+};
+
+export const deleteCartListById = async (id: string) => {
+  try {
+    const docRef = doc(db, 'cart', id);
+    await deleteDoc(docRef);
+    return;
+  } catch (err) {
+    throw Error(`Error delete item with id: ${id}`);
+  }
+};
