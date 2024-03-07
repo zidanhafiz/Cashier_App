@@ -57,7 +57,8 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (!isMobile) setOpenCart(true);
+    if (!isMobile) return setOpenCart(true);
+    return setOpenCart(false);
   }, [isMobile]);
 
   return (

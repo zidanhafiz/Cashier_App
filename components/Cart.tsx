@@ -16,6 +16,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { deleteAllCartList, getAllCartList } from '@/lib/firebase/cartService';
 import { useAlert } from '@/context/AlertProvider';
 import { showAlert } from './Alert';
+import DialogModalEdit from './DialogModalEdit';
 
 const clearMessage = {
   title: 'Clear this cart?',
@@ -34,6 +35,8 @@ const Cart = ({ listChanged, setListChanged, openCart }: CartProps) => {
   const [cartList, setCartList] = useState<ProductCart[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [productEdit, setProductEdit] = useState<ProductCart | null>(null);
 
   const { showAlertHandle } = useAlert();
 
@@ -56,6 +59,7 @@ const Cart = ({ listChanged, setListChanged, openCart }: CartProps) => {
         return deleteAllCartList(cartList);
       })
       .then(() => {
+        setTotalPrice(0);
         setListChanged('');
         setLoading(false);
         setCartList([]);
@@ -67,15 +71,30 @@ const Cart = ({ listChanged, setListChanged, openCart }: CartProps) => {
       });
   };
 
+  const showDialogModalEdit = (productEdit: ProductCart) => {
+    setProductEdit(productEdit);
+    setOpen(true);
+  };
+
   if (openCart)
     return (
       <Card className='absolute inset-x-0 -inset-y-4 lg:static lg:h-fit'>
+        {productEdit && (
+          <DialogModalEdit
+            product={productEdit}
+            open={open}
+            setOpen={setOpen}
+            setListChanged={setListChanged}
+          />
+        )}
         <CardHeader>
           <CardTitle className='flex gap-4'>
             <ShoppingCart />
             Cart
           </CardTitle>
-          <CardDescription className='pt-2'>This is list of your cart</CardDescription>
+          <CardDescription className='pt-2'>
+            This is list of your cart
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ScrollArea
@@ -90,6 +109,7 @@ const Cart = ({ listChanged, setListChanged, openCart }: CartProps) => {
                   key={list.id}
                   productCart={list}
                   listChanged={listChanged}
+                  showDialogModalEdit={showDialogModalEdit}
                 />
               ))
             ) : (
@@ -110,7 +130,9 @@ const Cart = ({ listChanged, setListChanged, openCart }: CartProps) => {
 const CartList = ({
   productCart,
   listChanged,
+  showDialogModalEdit,
 }: {
+  showDialogModalEdit: (productEdit: ProductCart) => void;
   productCart: ProductCart;
   listChanged: string;
 }) => {
@@ -118,15 +140,23 @@ const CartList = ({
 
   return (
     <div className='flex items-center gap-3 w-full border-y py-3'>
-      <Button className='p-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-white'>
+      <Button
+        className='p-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-white'
+        onClick={() => showDialogModalEdit(productCart)}
+      >
         <Pencil size={18} />
       </Button>
       <span
-        className={cn('w-full max-w-[100px] leading-5 text-lg font-semibold', animate)}
+        className={cn(
+          'w-full max-w-[100px] leading-5 text-lg font-semibold',
+          animate
+        )}
       >
         {capitalizeFirstWord(productCart.name)}
       </span>
-      <span className={cn('flex-1 text-center', animate)}>{productCart.quantity}x</span>
+      <span className={cn('flex-1 text-center', animate)}>
+        {productCart.quantity}x
+      </span>
       <span className={cn('text-lg text-end w-full max-w-[150px]', animate)}>
         {toRupiah(productCart.totalPrice)}
       </span>
