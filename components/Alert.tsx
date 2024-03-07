@@ -50,7 +50,9 @@ export const Alert = ({
             {messages.cancel}
           </AlertDialogCancel>
           <AlertDialogAction
-            className={cn(variant === 'discard' && 'bg-red-500 hover:bg-red-600')}
+            className={cn(
+              variant === 'discard' && 'bg-red-500 hover:bg-red-600 text-white'
+            )}
             onClick={() => onClick(true)}
           >
             {messages.continue}
