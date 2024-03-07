@@ -11,29 +11,36 @@ import {
 } from './ui/card';
 import { ScrollArea } from './ui/scroll-area';
 import { ProductCart } from '@/types';
-import { capitalizeFirstWord, cn, toRupiah } from '@/lib/utils';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { capitalizeFirstWord, cn, showNotify, toRupiah } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 import { deleteAllCartList } from '@/lib/firebase/cartService';
 import { useAlert } from '@/context/AlertProvider';
 import { showAlert } from './Alert';
 import DialogModalEdit from './DialogModalEdit';
 import { DocumentData, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase/firebase';
+import { createTransaction } from '@/lib/firebase/transactionService';
 
 const clearMessage = {
-  title: 'Clear this cart?',
+  title: 'Clear Cart',
   description: 'Are you sure to delete all of this?',
+  cancel: 'Cancel',
+  continue: 'Yes',
+};
+
+const saveMessage = {
+  title: 'Save Transaction',
+  description: 'Are you sure to save this transaction?',
   cancel: 'Cancel',
   continue: 'Yes',
 };
 
 type CartProps = {
   listChanged: string;
-  setListChanged: Dispatch<SetStateAction<string>>;
   openCart: boolean;
 };
 
-const Cart = ({ listChanged, setListChanged, openCart }: CartProps) => {
+const Cart = ({ listChanged, openCart }: CartProps) => {
   const [cartList, setCartList] = useState<ProductCart[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -74,6 +81,34 @@ const Cart = ({ listChanged, setListChanged, openCart }: CartProps) => {
         setTotalPrice(0);
         setLoading(false);
         setCartList([]);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  };
+
+  const saveCartHandle = async () => {
+    setLoading(true);
+
+    const data = {
+      totalPrice,
+      products: cartList,
+    };
+
+    showAlert(saveMessage, 'save', showAlertHandle)
+      .then(() => {
+        return createTransaction(data);
+      })
+      .then(() => {
+        return deleteAllCartList(cartList);
+      })
+      .then(() => {
+        setLoading(false);
+        showNotify({
+          type: 'success',
+          message: 'Transaction success!',
+        });
       })
       .catch((err) => {
         console.error(err);
@@ -129,6 +164,7 @@ const Cart = ({ listChanged, setListChanged, openCart }: CartProps) => {
           loading={loading}
           cartList={cartList}
           clearCartHandle={clearCartHandle}
+          saveCartHandle={saveCartHandle}
         />
       </Card>
     );
@@ -169,6 +205,7 @@ const CartList = ({
 const Footer = ({
   totalPrice,
   clearCartHandle,
+  saveCartHandle,
   cartList,
   loading,
 }: {
@@ -176,6 +213,7 @@ const Footer = ({
   loading: boolean;
   cartList: ProductCart[];
   clearCartHandle: () => Promise<void>;
+  saveCartHandle: () => Promise<void>;
 }) => {
   return (
     <CardFooter className='flex flex-col gap-8'>
@@ -201,6 +239,7 @@ const Footer = ({
         <Button
           className='flex gap-2 text-lg w-1/2 py-6 rounded-lg'
           disabled={loading || cartList.length === 0}
+          onClick={saveCartHandle}
         >
           {loading ? (
             <Loader2 className='animate-spin' />

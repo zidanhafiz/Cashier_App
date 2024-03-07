@@ -19,3 +19,10 @@ type ProductCart = {
   totalPrice: number;
   createdAt: Timestamp;
 };
+
+type TransactionList = {
+  createdAt: Timestamp;
+  id: string;
+  products: ProductCart[];
+  totalPrice: number;
+};
