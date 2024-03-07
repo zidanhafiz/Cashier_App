@@ -83,7 +83,6 @@ const Dashboard = () => {
         </ScrollArea>
         <Cart
           listChanged={listChanged}
-          setListChanged={setListChanged}
           openCart={openCart}
         />
       </div>
