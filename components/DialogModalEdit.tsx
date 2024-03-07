@@ -2,20 +2,9 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import { DocumentData } from 'firebase/firestore';
-import {
-  Dispatch,
-  FormEvent,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
+import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from 'react';
 import { FilePenLine, Trash2 } from 'lucide-react';
-import {
-  capitalizeFirstWord,
-  formatDate,
-  showNotify,
-  toRupiah,
-} from '@/lib/utils';
+import { capitalizeFirstWord, formatDate, showNotify, toRupiah } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { Input } from './ui/input';
 import { deleteCartListById, updateCartList } from '@/lib/firebase/cartService';
@@ -24,15 +13,9 @@ type Props = {
   product: DocumentData;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setListChanged: Dispatch<SetStateAction<string>>;
 };
 
-export default function DialogModalEdit({
-  product,
-  open,
-  setOpen,
-  setListChanged,
-}: Props) {
+export default function DialogModalEdit({ product, open, setOpen }: Props) {
   const [quantity, setQuantity] = useState<number>(product.quantity);
   const [newPrice, setNewPrice] = useState<number>(product.totalPrice);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +32,7 @@ export default function DialogModalEdit({
       return setNewPrice(sum);
     }
     return setNewPrice(0);
-  }, [quantity]);
+  }, [quantity, product.price]);
 
   const quantityBtnHandle = (type: 'plus' | 'minus') => {
     if (type === 'plus') {
@@ -62,16 +45,13 @@ export default function DialogModalEdit({
 
   const deleteHandle = async () => {
     setLoading(true);
-    setListChanged('');
     try {
       await deleteCartListById(product.id);
       setLoading(false);
       setOpen(false);
-      setListChanged(product.id);
     } catch (err) {
       setLoading(false);
       setOpen(false);
-      setListChanged(product.id);
       showNotify({
         type: 'error',
         message: err as string,
@@ -83,7 +63,6 @@ export default function DialogModalEdit({
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setListChanged('');
 
     if (quantity < 1) {
       setLoading(false);
@@ -94,10 +73,8 @@ export default function DialogModalEdit({
       await updateCartList(product.id, quantity, newPrice);
       setError(null);
       setLoading(false);
-      setListChanged(product.id);
       return setOpen(false);
     } catch (err) {
-      setListChanged(product.id);
       setLoading(false);
       return setError(err as string);
     }
