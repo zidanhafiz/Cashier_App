@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { logOut } from '@/lib/firebase/authLogin';
 import { useSignIn } from '@/context/SignInProvider';
 import { ThemeToggle } from './ThemeToggle';
+import Image from 'next/image';
 
 const Navbar = () => {
   return (
@@ -21,9 +22,16 @@ const Navbar = () => {
       <nav className='flex justify-between items-center py-2 px-4 border-b'>
         <Link
           href='/dashboard'
-          className='text-xl font-bold'
+          className='text-xl font-semibold flex items-center gap-2'
         >
-          Cashier App
+          <Image
+            className='w-10'
+            src='/logo.png'
+            width={200}
+            height={200}
+            alt='logo'
+          />
+          <span className='hidden md:block'>Cashier App</span>
         </Link>
         <div className='flex items-center gap-4 w-fit'>
           <ThemeToggle />
