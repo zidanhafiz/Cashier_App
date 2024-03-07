@@ -42,7 +42,7 @@ export const createTransaction = async (cartData: CartData) => {
 export const getAllTransaction = async () => {
   try {
     const colRef = collection(db, 'transaction');
-    const q = query(colRef, orderBy('createdAt', 'asc'));
+    const q = query(colRef, orderBy('createdAt', 'desc'));
     const res = await getDocs(q);
     const transactionData: DocumentData[] = [];
 
