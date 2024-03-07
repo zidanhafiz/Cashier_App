@@ -17,9 +17,9 @@ const TransactionCard = ({ transaction }: Props) => {
         <CardContent>
           <p className='max-w-[270px] lg:max-w-[600px] truncate'>
             {transaction.products.map((product) => (
-              <>
+              <span key={product.id}>
                 {capitalizeFirstWord(product.name)} {product.quantity}x,
-              </>
+              </span>
             ))}
           </p>
           <p className='mt-2 font-semibold'>Total: {toRupiah(transaction.totalPrice)}</p>

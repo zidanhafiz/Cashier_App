@@ -60,8 +60,9 @@ export const getDetailTransactionById = async (id: string) => {
   try {
     const docRef = doc(db, 'transaction', id);
     const res = await getDoc(docRef);
+    const data = res.data();
 
-    return res.data();
+    return data;
   } catch (err) {
     throw Error('Error get transaction details!');
   }
