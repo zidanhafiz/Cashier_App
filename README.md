@@ -6,7 +6,7 @@ This is a Web app to manage a store's products and also serve as a cashier tool 
 
 Here's the demo link:
 
-[![Static Badge](https://img.shields.io/badge/Cashier%20App-black?style=for-the-badge&logo=vercel&logoColor=white)](https://www.linkedin.com/in/zidanhafiz)
+[![Static Badge](https://img.shields.io/badge/Cashier%20App-black?style=for-the-badge&logo=vercel&logoColor=white)](https://cashier-app-phi.vercel.app/)
 
 email: admin@admin.com
 
